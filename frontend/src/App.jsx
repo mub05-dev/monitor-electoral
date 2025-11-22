@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, Fragment } from "react";
-import { getAllCandidates, getDhondtResults } from "./data/api";
+import { getAllCandidates, getDhondtResults, getHemicycle } from "./data/api";
 import { distritosData } from "./const/distritos";
+
+import Hemicycle from "./components/Hemicycle";
 
 import {
   Box,
@@ -85,6 +87,8 @@ export default function App() {
     parties: new Map(),
   });
 
+  const [nationalData, setNationalData] = useState([]);
+
   const dataType = tabValue === 0 ? "simulacion" : "real";
   const themeColor = dataType === "real" ? "success" : "primary";
 
@@ -96,6 +100,21 @@ export default function App() {
   };
 
   const formatNumber = (num) => new Intl.NumberFormat("es-CL").format(num);
+
+  useEffect(() => {
+    const loadNational = async () => {
+      try {
+        // Llamamos al endpoint nacional pasando el tipo (real/simulacion)
+        const res = await getHemicycle(dataType);
+        if (res.data && res.data.diputados) {
+          setNationalData(res.data.diputados);
+        }
+      } catch (e) {
+        console.error("Error cargando datos nacionales:", e);
+      }
+    };
+    loadNational();
+  }, [dataType]);
 
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -273,7 +292,12 @@ export default function App() {
       </Box>
 
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 4 } }}>
-        {/* PANEL DE CONTROL */}
+        {nationalData.length > 0 && (
+          <Hemicycle
+            diputados={nationalData}
+            pactColors={theme.palette.pactColors}
+          />
+        )}
         <Paper sx={{ mb: 4, p: 0 }}>
           <Grid container>
             <Grid item xs={12} md={6}>
