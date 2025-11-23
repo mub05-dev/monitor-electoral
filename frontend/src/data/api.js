@@ -20,9 +20,9 @@ const getDhondtResults = async (distrito, type = "simulacion") => {
   return response;
 };
 
-const getHemicycle = async (tipo) => {
+const getNacionalResults = async (tipo) => {
   const response = await axios.get("nacional");
   return response;
 };
 
-export { getAllCandidates, getDhondtResults, getHemicycle };
+export { getAllCandidates, getDhondtResults, getNacionalResults };

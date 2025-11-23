@@ -1,6 +1,6 @@
-
 import { createTheme } from "@mui/material/styles";
 
+// Tus colores de pactos (Intactos)
 const pactColors = {
   B: "#d0fae5", 
   E: "#2e7d32",
@@ -17,17 +17,19 @@ const pactColors = {
   default: "#455a64",
 };
 
-const BORDER_RADIUS = 12;
-const FONT_FAMILY =
-  "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
+// Definición de Fuentes
+const FONT_HEADING = "'Merriweather', serif";
+const FONT_BODY = "'Lato', sans-serif";
+
+const BORDER_RADIUS = 8; // Un poco más cuadrado para ser más formal (antes 12)
 
 export const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#0d6efd", 
-      light: "#7ab8ff",
-      dark: "#0047a9",
+      main: "#102a43", // Azul Noche Corporativo (Coincide con Login)
+      light: "#486581",
+      dark: "#061523",
     },
     secondary: {
       main: "#6c757d", 
@@ -36,134 +38,126 @@ export const theme = createTheme({
       main: "#198754", 
     },
     background: {
-      default: "#f8f9fa",
+      default: "#f0f4f8", // Gris azulado muy suave (Coincide con Login)
       paper: "#ffffff",
     },
     text: {
-      primary: "#212529", 
-      secondary: "#6c757d",
+      primary: "#102a43", // Texto principal azul muy oscuro (mejor lectura)
+      secondary: "#486581",
     },
-
     pactColors: pactColors,
   },
 
   typography: {
-    fontFamily: FONT_FAMILY,
-    h1: { fontWeight: 700 },
-    h2: { fontWeight: 700 },
-    h3: { fontWeight: 700 },
-    h4: { fontWeight: 600 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
+    fontFamily: FONT_BODY, // Por defecto Lato
+    h1: { fontFamily: FONT_HEADING, fontWeight: 900 },
+    h2: { fontFamily: FONT_HEADING, fontWeight: 700 },
+    h3: { fontFamily: FONT_HEADING, fontWeight: 700 },
+    h4: { fontFamily: FONT_HEADING, fontWeight: 700 },
+    h5: { fontFamily: FONT_HEADING, fontWeight: 700 },
+    h6: { fontFamily: FONT_HEADING, fontWeight: 700 },
+    subtitle1: { fontFamily: FONT_BODY, fontWeight: 600 },
+    subtitle2: { fontFamily: FONT_BODY, fontWeight: 600 },
     button: {
-      fontWeight: 500,
-      textTransform: "none",
+      fontFamily: FONT_BODY,
+      fontWeight: 700,
+      textTransform: "none", // Evita mayúsculas forzadas
     },
   },
 
   shape: {
     borderRadius: BORDER_RADIUS,
   },
+  
   shadows: [
-    "none", // 0
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 6px 16px 0 rgba(0,0,0,0.08)", 
-    "0 8px 20px 0 rgba(0,0,0,0.09)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
-    "0 4px 12px 0 rgba(0,0,0,0.07)",
+    "none", 
+    "0px 2px 4px rgba(16, 42, 67, 0.1)", // Sombra suave 1
+    "0px 4px 8px rgba(16, 42, 67, 0.1)", // Sombra suave 2
+    "0px 8px 16px rgba(16, 42, 67, 0.1)", // Sombra suave 3
+    "0px 12px 24px rgba(16, 42, 67, 0.1)",
+    ...Array(20).fill("none") // Relleno para evitar errores
   ],
 
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: "#f8f9fa",
+          backgroundColor: "#f0f4f8",
+          fontFamily: FONT_BODY,
         },
       },
     },
     MuiPaper: {
       defaultProps: {
-        elevation: 0,
+        elevation: 1, // Usamos la sombra suave 1 por defecto
       },
       styleOverrides: {
         root: {
-          border: "1px solid #dee2e6",
+          border: "1px solid rgba(16, 42, 67, 0.1)", // Borde sutil
+          backgroundImage: 'none', // Quitar overlay en modo dark si se usara
         },
       },
     },
-
     MuiButton: {
       defaultProps: {
         disableElevation: true,
       },
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          padding: "10px 24px",
+          borderRadius: 6,
+          padding: "8px 20px",
         },
-        containedSuccess: {
-          backgroundColor: "#198754",
-          "&:hover": {
-            backgroundColor: "#157347",
-          },
-        },
+        containedPrimary: {
+           // El color ya viene de palette.primary.main
+        }
       },
     },
-
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 6,
+          backgroundColor: "#fff",
         },
       },
     },
-
     MuiTableCell: {
       styleOverrides: {
         head: {
-          padding: "12px 16px",
-          backgroundColor: "#f1f3f5", 
-          color: "#495057", 
+          padding: "14px 16px",
+          backgroundColor: "#f8f9fa", 
+          color: "#334e68", 
           textTransform: "uppercase", 
-          fontSize: "0.75rem",
-          fontWeight: 600,
-          borderBottom: "1px solid #dee2e6",
+          fontSize: "0.7rem",
+          fontWeight: 800,
+          letterSpacing: "0.5px",
+          borderBottom: "2px solid #d9e2ec",
+          fontFamily: FONT_BODY
         },
         body: {
-          borderBottom: "1px solid #e9ecef",
+          borderBottom: "1px solid #f0f4f8",
+          padding: "12px 16px",
         },
       },
     },
-
     MuiChip: {
       styleOverrides: {
         root: {
-          fontWeight: 600,
+          fontWeight: 700,
+          borderRadius: 6,
         },
-
         filledPrimary: {
-          backgroundColor: "#0d6efd",
+          backgroundColor: "#102a43",
           color: "#fff",
         },
       },
     },
+    MuiAppBar: {
+        styleOverrides: {
+            root: {
+                backgroundColor: "#102a43", // Asegurar navbar oscuro
+                boxShadow: "0px 4px 12px rgba(0,0,0,0.2)"
+            }
+        }
+    }
   },
 });
