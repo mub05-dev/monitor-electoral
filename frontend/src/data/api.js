@@ -25,9 +25,20 @@ const getNacionalResults = async (tipo) => {
   return response;
 };
 
+const getNacionalStats = async () => {
+  const response = await axios.get("stats/genero");
+  return response;
+};
+
 const login = async (username, password) => {
   const response = await axios.post("login", { username, password });
   return response;
 };
 
-export { getAllCandidates, getDhondtResults, getNacionalResults, login };
+export {
+  getAllCandidates,
+  getDhondtResults,
+  getNacionalResults,
+  getNacionalStats,
+  login,
+};

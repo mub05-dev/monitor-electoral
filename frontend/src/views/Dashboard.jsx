@@ -2,91 +2,117 @@ import React, { useState } from "react";
 import {
   Box,
   Container,
+  Paper,
   Tabs,
   Tab,
-  Paper,
-  Switch,
-  FormControlLabel,
   Typography,
+  Alert,
+  Fade,
   useTheme,
 } from "@mui/material";
+
+import HowToVoteIcon from "@mui/icons-material/HowToVote";
+import ScienceIcon from "@mui/icons-material/Science";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import HomeIcon from "@mui/icons-material/Home";
+
 import Navbar from "../components/layout/Navbar";
 import NationalView from "./NationalView";
 import DistrictView from "./DistrictView";
-import PublicIcon from "@mui/icons-material/Public";
-import MapIcon from "@mui/icons-material/Map";
+import GenderView from "./GenderView";
+import ParticipationCard from "../components/ParticipationCard";
+import SimulationView from "./SimulationView";
 
 export default function Dashboard() {
   const theme = useTheme();
-  const [viewMode, setViewMode] = useState(0);
-  const [isRealData, setIsRealData] = useState(false);
+  const [currentTab, setCurrentTab] = useState(0);
 
-  const dataType = isRealData ? "real" : "simulacion";
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue);
+  };
+
   const pactColors = theme.palette.pactColors;
 
   return (
     <Box sx={{ pb: 8, minHeight: "100vh", bgcolor: "#f4f6f8" }}>
       <Navbar />
-      <Container maxWidth="xl">
-        <Paper
-          sx={{
-            mb: 4,
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-          }}>
+      <Paper
+        elevation={0}
+        sx={{
+          bgcolor: "white",
+          borderBottom: "1px solid #e0e0e0",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          px: { xs: 2, md: 4 },
+        }}>
+        <Container maxWidth="xl" disableGutters>
           <Tabs
-            value={viewMode}
-            onChange={(e, v) => setViewMode(v)}
-            indicatorColor="primary"
-            textColor="primary">
+            value={currentTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                minHeight: 64,
+                gap: 1,
+              },
+              "& .Mui-selected": {
+                color: theme.palette.primary.main,
+              },
+            }}>
+            <Tab icon={<HomeIcon />} iconPosition="start" label="Home" />
             <Tab
-              icon={<PublicIcon />}
-              label="Panorama Nacional"
+              icon={<ScienceIcon />}
               iconPosition="start"
+              label="Simulación (Encuestas)"
             />
             <Tab
-              icon={<MapIcon />}
-              label="Detalle por Distrito"
+              icon={<HowToVoteIcon />}
               iconPosition="start"
+              label="Resultados 2025"
+            />
+            <Tab
+              icon={<BarChartIcon />}
+              iconPosition="start"
+              label="Estadísticas"
             />
           </Tabs>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isRealData}
-                onChange={(e) => setIsRealData(e.target.checked)}
-                color="success"
-              />
-            }
-            label={
-              <Typography
-                variant="body2"
-                fontWeight="bold"
-                color={isRealData ? "success.main" : "text.secondary"}>
-                {isRealData
-                  ? "🟢 DATOS REALES (LIVE)"
-                  : "🔵 SIMULACIÓN (ENCUESTAS)"}
-              </Typography>
-            }
-            sx={{
-              border: "1px solid #e0e0e0",
-              pr: 2,
-              borderRadius: 2,
-              ml: "auto",
-            }}
-          />
-        </Paper>
-        <Box>
-          {viewMode === 0 ? (
-            <NationalView dataType={dataType} pactColors={pactColors} />
-          ) : (
-            <DistrictView dataType={dataType} pactColors={pactColors} />
-          )}
-        </Box>
+        </Container>
+      </Paper>
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
+        {currentTab === 0 && (
+          <Fade in={true} timeout={500}>
+            <Box>
+              <ParticipationCard />
+              <NationalView dataType="real" pactColors={pactColors} />
+            </Box>
+          </Fade>
+        )}
+        {currentTab === 1 && (
+          <Fade in={true} timeout={500}>
+            <Box>
+              <SimulationView pactColors={pactColors}/>
+            </Box>
+          </Fade>
+        )}
+        {currentTab === 2 && (
+          <Fade in={true} timeout={500}>
+            <Box>
+              <DistrictView dataType="real" pactColors={pactColors} />
+            </Box>
+          </Fade>
+        )}
+        {currentTab === 3 && (
+          <Fade in={true} timeout={500}>
+            <Box>
+              <GenderView />
+            </Box>
+          </Fade>
+        )}
       </Container>
     </Box>
   );
