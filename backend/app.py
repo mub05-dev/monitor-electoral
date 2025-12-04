@@ -103,6 +103,69 @@ def normalize_string_aggressive(s):
 
 
 # ==========================================
+#  CONFIGURACIÓN DE ESCENARIOS (FUSIONES)
+# ==========================================
+SCENARIOS = {
+    "derecha_unida": {
+        "new_id": "SC_DER",
+        "new_name": "Gran Pacto Derecha (Chile Vamos + Republicanos)",
+        "merge_ids": ["J", "K"], # J: Chile Vamos, K: Republicanos
+        "color_ref": "K" # Usaremos el color de Republicanos para la barra
+    },
+    "izquierda_unida": {
+        "new_id": "SC_IZQ",
+        "new_name": "Gran Pacto Izquierda (Oficialismo + DC)",
+        # A: Ecologistas, B: Verdes, C: Unidad, D: Centro, F: PSC, G: Dignidad, H: Humanistas
+        # Ajusta estas letras según tus pactos reales
+        "merge_ids": ["A", "B", "C", "D", "F", "G", "H"], 
+        "color_ref": "C" # Usaremos el color de Unidad por Chile
+    }
+}
+
+def apply_scenario_logic(data, scenario_key):
+    """
+    Recibe la data cruda de un distrito y fusiona pactos según el escenario.
+    Retorna la data modificada lista para el cálculo D'Hondt.
+    """
+    if not scenario_key or scenario_key not in SCENARIOS:
+        return data
+
+    sc = SCENARIOS[scenario_key]
+    target_ids = set(sc['merge_ids'])
+    new_pact_id = sc['new_id']
+    
+    # 1. Crear el "Super Pacto" acumulador
+    super_pact = Pact(new_pact_id, sc['new_name'], 0.0)
+    
+    clean_pacts = []
+    
+    # 2. Sumar votos de los pactos a fusionar
+    for p in data['pacts']:
+        if p['_id'] in target_ids:
+            super_pact.votes += p['votes']
+        else:
+            clean_pacts.append(p) # Los que no se fusionan pasan igual
+    
+    # Solo agregamos el super pacto si tiene votos
+    if super_pact.votes > 0:
+        clean_pacts.append(asdict(super_pact))
+        
+    # 3. Mover Partidos al nuevo Pacto (Vital para D'Hondt)
+    for party in data['parties']:
+        if party['list_id'] in target_ids:
+            party['list_id'] = new_pact_id
+            
+    # 4. Mover Candidatos al nuevo Pacto
+    for cand in data['candidates']:
+        if cand['pact_id'] in target_ids:
+            cand['pact_id'] = new_pact_id
+
+    # Actualizamos la estructura de datos
+    data['pacts'] = clean_pacts
+    return data
+
+
+# ==========================================
 #  AUTENTICACIÓN (NUEVO)
 # ==========================================
 
@@ -364,109 +427,128 @@ def get_simulation_data(distrito_num):
 
 
 @app.route("/nacional")
-@token_required
+# @token_required
 def get_nacional_results():
-    # Forzamos modo REAL para este endpoint (Hemiciclo Oficial)
+    # Recibimos params: tipo (real/simulacion) y escenario (derecha_unida/izquierda_unida)
     tipo = request.args.get('tipo', 'real')
+    escenario = request.args.get('escenario', '') 
+    
     all_elected = []
+    
+    # Estructura para el resumen lateral
+    national_summary = defaultdict(lambda: {'votes': 0, 'seats': 0, 'name': '', 'is_scenario': False})
 
-    # Acumulador Global (Votos de TODOS los candidatos)
-    national_summary = defaultdict(
-        lambda: {'votes': 0, 'seats': 0, 'name': ''})
-
+    # Carga de metadata (solo una vez)
     json_data = None
     try:
-        json_data = requests.get(URL_METADATA_JSON, headers={
-                                 'User-Agent': 'Mozilla/5.0'}, timeout=5).json()
+        json_data = requests.get(URL_METADATA_JSON, headers={'User-Agent': 'Mozilla/5.0'}, timeout=5).json()
     except:
         pass
 
     def process(i):
         d = str(i)
-        # 1. Obtener datos completos (Candidatos + Totales de Pacto)
+        # 1. Obtener Data Base (Real o Simulada)
         if tipo == 'real':
             res = get_real_data_emol(d, preloaded_json=json_data)
         else:
             res = get_simulation_data(d)
 
+        # 2. APLICAR ESCENARIO (Aquí ocurre la fusión matemática)
+        if escenario:
+            res = apply_scenario_logic(res, escenario)
+
+        # 3. Calcular D'Hondt con los datos ya fusionados
         candidates = res['candidates']
         seats = res['seats']
-        pacts_data = res['pacts']  # Aquí vienen los votos totales del distrito
+        pacts_data = res['pacts']
 
         dist_elected = []
         if candidates:
-            # Calcular Escaños
-            dist_elected = calculate_dhondt(
-                candidates, res['parties'], pacts_data, seats)
+            dist_elected = calculate_dhondt(candidates, res['parties'], pacts_data, seats)
 
         return dist_elected, pacts_data
 
-    # Barrido de 28 distritos
+    # Ejecución Paralela (Rápida)
     with concurrent.futures.ThreadPoolExecutor(max_workers=14) as executor:
         results = executor.map(process, range(1, 29))
 
         for elected_list, pacts_list in results:
             all_elected.extend(elected_list)
 
-            # ACUMULACIÓN VOTOS (Suma bruta real)
+            # Sumar Votos al Resumen Nacional
             for p in pacts_list:
                 pid = p['_id']
                 national_summary[pid]['votes'] += p['votes']
-                # Guardar nombre si no existe
                 if not national_summary[pid]['name']:
                     national_summary[pid]['name'] = p['name']
+                
+                # Marcamos si es un pacto de escenario para mostrarlo siempre
+                if pid.startswith("SC_"):
+                    national_summary[pid]['is_scenario'] = True
 
-    # ACUMULACIÓN ESCAÑOS
+    # Sumar Escaños
     for c in all_elected:
         national_summary[c['pact_id']]['seats'] += 1
 
-    # Ordenar Hemiciclo
-    all_elected.sort(key=lambda c: PACTO_ORDER.index(
-        c['pact_id']) if c['pact_id'] in PACTO_ORDER else 99)
+    # Ordenar lista de diputados (Hemiciclo)
+    # Agregamos los IDs de escenarios al orden para que se agrupen visualmente
+    TEMP_ORDER = PACTO_ORDER + ["SC_IZQ", "SC_DER"]
+    all_elected.sort(key=lambda c: TEMP_ORDER.index(c['pact_id']) if c['pact_id'] in TEMP_ORDER else 99)
 
-    # --- GENERAR RESUMEN AGRUPADO ---
+    # --- GENERAR RESUMEN PARA LA TABLA LATERAL ---
     final_summary = []
-    # Bolsa para "Independientes" (X, Y)
-    # indep_acc = {'id': 'indep', 'name': 'Independientes', 'votes': 0, 'seats': 0, 'color_key': 'X'}
-
-    otros_acc = {'id': 'others', 'name': 'Otros Partidos',
-                 'votes': 0, 'seats': 0, 'color_key': 'default'}
+    
+    otros_acc = {'id': 'others', 'name': 'Otros Partidos', 'votes': 0, 'seats': 0, 'color_key': 'default'}
 
     for pid, stats in national_summary.items():
         if stats['votes'] > 0:
-            # 1. Pactos Principales (Se muestran)
-            if pid in MAIN_PACTS_IDS:
+            should_show = False
+            
+            # Mostrar si es el Super Pacto
+            if stats['is_scenario']:
+                should_show = True
+            # Mostrar si es un pacto principal Y NO ha sido absorbido por el escenario actual
+            elif pid in MAIN_PACTS_IDS:
+                if escenario and pid in SCENARIOS.get(escenario, {}).get('merge_ids', []):
+                    should_show = False # Ocultar porque ya está sumado en el SC_
+                else:
+                    should_show = True
+
+            if should_show:
+                # Resolver color para el Frontend
+                color_key = pid
+                # Usar colores existentes para los nuevos bloques
+                if pid == "SC_DER": color_key = SCENARIOS['derecha_unida']['color_ref']
+                if pid == "SC_IZQ": color_key = SCENARIOS['izquierda_unida']['color_ref']
+
                 final_summary.append({
                     "id": pid,
                     "name": stats['name'],
                     "votes": stats['votes'],
-                    "seats": stats['seats']
+                    "seats": stats['seats'],
+                    "color_key": color_key
                 })
-            # 2. Independientes (X, Y)
-            # elif pid in ['X', 'Y']:
-            #     indep_acc['votes'] += stats['votes']
-            #     indep_acc['seats'] += stats['seats']
-            # # 3. Resto (A, D, E, etc) -> Otros
-            else:
-                otros_acc['votes'] += stats['votes']
-                otros_acc['seats'] += stats['seats']
+            elif not stats['is_scenario']: 
+                # Lógica para "Otros": Solo sumar si NO fue absorbido por el escenario
+                is_absorbed = False
+                if escenario and pid in SCENARIOS.get(escenario, {}).get('merge_ids', []):
+                    is_absorbed = True
+                
+                if not is_absorbed:
+                    otros_acc['votes'] += stats['votes']
+                    otros_acc['seats'] += stats['seats']
 
-    # Agregar bolsas si tienen votos
-    # if indep_acc['votes'] > 0: final_summary.append(indep_acc)
     if otros_acc['votes'] > 0:
         final_summary.append(otros_acc)
 
-    # Ordenar Resumen por Escaños
     final_summary.sort(key=lambda x: x['seats'], reverse=True)
 
     return jsonify({
         "total": len(all_elected),
         "diputados": all_elected,
-        "resumen": final_summary
+        "resumen": final_summary,
+        "escenario_activo": escenario
     })
-
-# --- ENDPOINTS DISTRITALES ---
-
 
 @app.route("/candidatos")
 def route_candidatos():
@@ -494,6 +576,113 @@ def route_dhondt():
     elected = calculate_dhondt(
         data['candidates'], data['parties'], data['pacts'], seats)
     return jsonify({"elected": elected, "cupos_distrito": seats, "fuente": t})
+
+
+# ==========================================
+#  ENDPOINT MEJORADO: ESTADÍSTICAS DE GÉNERO + DESGLOSE
+# ==========================================
+
+@app.route("/stats/genero")
+# @token_required 
+def stats_genero():
+    """
+    Retorna totales nacionales y un desglose por distrito de 
+    Hombres/Mujeres (Candidatos y Electos).
+    """
+    # 1. Estructura base
+    response_data = {
+        "nacional": {
+            "candidatos": { "hombres": 0, "mujeres": 0, "total": 0 },
+            "electos":    { "hombres": 0, "mujeres": 0, "total": 0 }
+        },
+        "distritos": [] # Aquí irá el detalle: [{distrito: "1", hombres: 2, mujeres: 1}, ...]
+    }
+
+    # 2. Cargar metadata una sola vez
+    json_data = None
+    try:
+        json_data = requests.get(URL_METADATA_JSON, headers={
+                                 'User-Agent': 'Mozilla/5.0'}, timeout=5).json()
+    except Exception as e:
+        return jsonify({"error": "No se pudo cargar metadata externa", "details": str(e)}), 500
+
+    # 3. Función procesadora por distrito
+    def process_gender_district(i):
+        distrito_id = str(i)
+        
+        # Obtener data real + D'Hondt
+        res = get_real_data_emol(distrito_id, preloaded_json=json_data)
+        candidates = res['candidates']
+        seats = res['seats']
+        
+        # Contadores locales
+        c_h, c_m = 0, 0 # Candidatos
+        e_h, e_m = 0, 0 # Electos
+
+        # A. Contar Candidatos
+        for c in candidates:
+            if c['gender'] == 'H': c_h += 1
+            elif c['gender'] == 'M': c_m += 1
+        
+        # B. Calcular Electos
+        elected_list = []
+        if candidates:
+            elected_list = calculate_dhondt(candidates, res['parties'], res['pacts'], seats)
+            
+        for e in elected_list:
+            if e['gender'] == 'H': e_h += 1
+            elif e['gender'] == 'M': e_m += 1
+                
+        # Retornamos un objeto con toda la info de este distrito
+        return {
+            "id": distrito_id,
+            "candidatos": {"h": c_h, "m": c_m, "t": c_h + c_m},
+            "electos":    {"h": e_h, "m": e_m, "t": e_h + e_m}
+        }
+
+    # 4. Ejecución Paralela
+    with concurrent.futures.ThreadPoolExecutor(max_workers=14) as executor:
+        results = executor.map(process_gender_district, range(1, 29))
+
+        for res in results:
+            # 1. Sumar al Nacional
+            response_data["nacional"]["candidatos"]["hombres"] += res["candidatos"]["h"]
+            response_data["nacional"]["candidatos"]["mujeres"] += res["candidatos"]["m"]
+            
+            response_data["nacional"]["electos"]["hombres"] += res["electos"]["h"]
+            response_data["nacional"]["electos"]["mujeres"] += res["electos"]["m"]
+
+            # 2. Agregar al Desglose Distrital
+            response_data["distritos"].append({
+                "distrito": res["id"],
+                "electos": {
+                    "hombres": res["electos"]["h"],
+                    "mujeres": res["electos"]["m"],
+                    "total": res["electos"]["t"]
+                },
+                # Opcional: También devolvemos candidatos por si quieres calcular % de éxito
+                "candidatos": {
+                    "hombres": res["candidatos"]["h"],
+                    "mujeres": res["candidatos"]["m"],
+                    "total": res["candidatos"]["t"]
+                }
+            })
+
+    # Calcular totales nacionales finales
+    response_data["nacional"]["candidatos"]["total"] = (
+        response_data["nacional"]["candidatos"]["hombres"] + 
+        response_data["nacional"]["candidatos"]["mujeres"]
+    )
+    response_data["nacional"]["electos"]["total"] = (
+        response_data["nacional"]["electos"]["hombres"] + 
+        response_data["nacional"]["electos"]["mujeres"]
+    )
+
+    # Ordenar la lista de distritos numéricamente (1, 2, ... 10, ... 28)
+    response_data["distritos"].sort(key=lambda x: int(x["distrito"]))
+
+    return jsonify(response_data)
+
 
 
 if __name__ == "__main__":
