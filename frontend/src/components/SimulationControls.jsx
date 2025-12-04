@@ -81,16 +81,7 @@ export default function SimulationControls({
           sx={{ px: 4, height: 40, fontWeight: "bold", textTransform: "none" }}>
           {isSimulating ? "Calculando..." : "Simular D'Hondt"}
         </Button>
-
-        {/* KPI Rápido (Opcional, se ve muy bien aquí) */}
-        <Box sx={{ ml: "auto", display: { xs: "none", md: "block" } }}>
-          <Typography variant="caption" color="text.secondary">
-            Simulación basada en proyección D'Hondt
-          </Typography>
-        </Box>
       </Box>
-
-      {/* FILA 2: PESTAÑAS DE VISTA (Tabs Internos) */}
       <Box sx={{ px: 2 }}>
         <Tabs
           value={currentTab}

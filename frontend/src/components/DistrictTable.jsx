@@ -25,10 +25,9 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
-
 const INCENTIVE_PER_WOMAN = 500;
 
-const CandidatesListTable = ({ candidates, pactNames={} }) => (
+const CandidatesListTable = ({ candidates, pactNames = {}, pactColors }) => (
   <TableContainer>
     <Table sx={{ width: "100%", tableLayout: "fixed" }}>
       <TableHead>
@@ -52,6 +51,8 @@ const CandidatesListTable = ({ candidates, pactNames={} }) => (
       <TableBody>
         {candidates.map((c) => {
           const pactFullName = pactNames[c.pact_id] || `Lista ${c.pact_id}`;
+          const pColor = pactColors[c.pact_id] || "#ccc";
+
           return (
             <TableRow key={c.name} hover>
               <TableCell>
@@ -81,20 +82,22 @@ const CandidatesListTable = ({ candidates, pactNames={} }) => (
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Box
                     sx={{
-                      width: 24,
-                      height: 24,
+                      width: 32,
+                      height: 32,
                       borderRadius: 1,
-                      bgcolor: "#ccc",
+                      bgcolor: pColor,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 10,
                       color: "white",
                       fontWeight: "bold",
                     }}>
                     {c.pact_id}
                   </Box>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    lineHeight={1.2}>
                     {pactFullName}
                   </Typography>
                 </Stack>
@@ -108,7 +111,6 @@ const CandidatesListTable = ({ candidates, pactNames={} }) => (
 );
 
 const ResultsAccordion = ({ candidates, pactColors, pactNames }) => {
-  
   const pactsGrouped = candidates.reduce((acc, c) => {
     if (!acc[c.pact_id]) {
       acc[c.pact_id] = { id: c.pact_id, candidates: [], votes: 0, women: 0 };
@@ -230,7 +232,7 @@ const ResultsAccordion = ({ candidates, pactColors, pactNames }) => {
                                     variant="caption"
                                     color="text.secondary">
                                     {c.display_party} •{" "}
-                                    {c.votes.toLocaleString("es-CL")} votos
+                                    {c.votes.toLocaleString("es-CL")} %
                                   </Typography>
                                 </Box>
                               </Paper>
@@ -358,9 +360,17 @@ export default function DistrictTable({
         />
       </Box>
       {isElectedMode ? (
-        <ResultsAccordion candidates={candidates} pactColors={pactColors} pactNames={pactNames} />
+        <ResultsAccordion
+          candidates={candidates}
+          pactColors={pactColors}
+          pactNames={pactNames}
+        />
       ) : (
-        <CandidatesListTable candidates={candidates} pactNames={pactNames} />
+        <CandidatesListTable
+          candidates={candidates}
+          pactNames={pactNames}
+          pactColors={pactColors}
+        />
       )}
     </Paper>
   );

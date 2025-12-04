@@ -130,7 +130,7 @@ export default function SimulationView({ pactColors }) {
               <DistrictTable
                 candidates={displayedCandidates}
                 title={
-                  currentTab === 2 ? "Resultados por Pacto" : "Nómina Completa"
+                  currentTab === 2 ? "Resultados por Pacto" : "Nómina Candidatos"
                 }
                 isElectedMode={currentTab === 2}
                 pactColors={pactColors}
