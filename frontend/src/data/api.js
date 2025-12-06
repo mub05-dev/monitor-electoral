@@ -20,8 +20,12 @@ const getDhondtResults = async (distrito, type = "simulacion") => {
   return response;
 };
 
-const getNacionalResults = async (tipo) => {
-  const response = await axios.get("nacional");
+const getNacionalResults = async (tipo, escenario = "") => {
+  const params = {};
+  if (tipo) params.tipo = tipo;
+  if (escenario) params.escenario = escenario;
+
+  const response = await axios.get("nacional", { params });
   return response;
 };
 

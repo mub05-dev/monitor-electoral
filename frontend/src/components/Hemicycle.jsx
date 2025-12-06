@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Box, Tooltip, Typography, Paper, Avatar, Stack } from "@mui/material";
+import { Box, Tooltip, Typography, Avatar, Stack } from "@mui/material";
 
 const Hemicycle = ({ diputados, pactColors }) => {
   const width = 900;
@@ -46,27 +46,24 @@ const Hemicycle = ({ diputados, pactColors }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-      }}>
+      }}
+    >
       <Box
         sx={{
           position: "relative",
           width: "100%",
           maxWidth: width,
           margin: "0 auto",
-        }}>
-        <Box sx={{ width: "100%", maxWidth: width, mb: 1 }}>
-          <Typography
-            variant="h5"
-            fontWeight="800"
-            sx={{ color: "#1a1a1a", letterSpacing: -0.5 }}>
-            Resumen nacional por pacto
-          </Typography>
-        </Box>
+        }}
+      >
+        {/* --- SECCIÓN BORRADA: EL TÍTULO YA NO VA AQUÍ --- */}
+        
         <svg
           viewBox={`0 0 ${width} ${height}`}
           width={width}
           height={height}
-          style={{ overflow: "visible" }}>
+          style={{ overflow: "visible" }}
+        >
           {chartData.map((dot, index) => {
             const pactId = dot.data.pact_id || "default";
             const color = pactColors[pactId] || "#ccc";
@@ -84,7 +81,8 @@ const Hemicycle = ({ diputados, pactColors }) => {
                   <Typography
                     variant="caption"
                     display="block"
-                    sx={{ opacity: 0.9 }}>
+                    sx={{ opacity: 0.9 }}
+                  >
                     {dot.data.display_party} • Distrito {dot.data.distrito_num}
                   </Typography>
                 </Box>
@@ -105,7 +103,8 @@ const Hemicycle = ({ diputados, pactColors }) => {
                       boxShadow: 3,
                     },
                   },
-                }}>
+                }}
+              >
                 <circle
                   cx={dot.x}
                   cy={dot.y}
@@ -135,7 +134,8 @@ const Hemicycle = ({ diputados, pactColors }) => {
             fontSize="72"
             fontWeight="800"
             fill="#333"
-            style={{ fontFamily: "Inter, sans-serif" }}>
+            style={{ fontFamily: "Inter, sans-serif" }}
+          >
             {diputados.length}
           </text>
 
@@ -146,7 +146,8 @@ const Hemicycle = ({ diputados, pactColors }) => {
             fontSize="18"
             fill="#666"
             fontWeight="600"
-            style={{ fontFamily: "Inter, sans-serif", letterSpacing: 4 }}>
+            style={{ fontFamily: "Inter, sans-serif", letterSpacing: 4 }}
+          >
             DIPUTADOS
           </text>
         </svg>

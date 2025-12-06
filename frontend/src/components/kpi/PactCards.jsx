@@ -12,14 +12,22 @@ const PactCards = ({ summaryData, pactColors }) => {
   if (!summaryData) return null;
 
   return (
-    <Box
-      sx={{ height: "100%", display: "flex", flexDirection: "column", p: 3 }}>
-      <Box
-        sx={{ flexGrow: 1, overflowY: "auto", maxHeight: { lg: 500 }, pr: 1 }}>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 1 }}>
         <Stack
           spacing={0}
-          divider={<Divider sx={{ borderStyle: "dashed", my: 1 }} />}>
+          divider={
+            <Divider
+              sx={{
+                borderStyle: "dashed",
+                borderColor: "rgba(0, 0, 0, 0.1)", // Gris muy suave
+                my: 1,
+              }}
+            />
+          }
+        >
           {summaryData.map((pact) => {
+            // Lógica para determinar el color
             const colorKey =
               pact.id === "others" || pact.id === "indep"
                 ? pact.color_key || "default"
@@ -33,43 +41,66 @@ const PactCards = ({ summaryData, pactColors }) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  py: 1,
-                }}>
+                  py: 0.5, // Reducimos padding para que se vea compacto
+                }}
+              >
+                {/* Lado Izquierdo: Barra de color + Texto */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  {/* Barra vertical de color */}
                   <Box
                     sx={{
                       width: 4,
-                      height: 36,
+                      height: 32,
                       bgcolor: color,
-                      borderRadius: 2,
+                      borderRadius: 4, 
                       flexShrink: 0,
                     }}
                   />
                   <Box>
                     <Typography
                       variant="body2"
-                      fontWeight={700}
-                      lineHeight={1.2}>
+                      sx={{ 
+                        fontWeight: 700, 
+                        color: "text.primary",
+                        fontSize: "0.95rem"
+                      }}
+                    >
                       {pact.name}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontSize: "0.75rem" }}
+                    >
                       {formatCompact(pact.votes)} votos
                     </Typography>
                   </Box>
                 </Box>
-                <Box sx={{ textAlign: "right", minWidth: 50 }}>
+
+                {/* Lado Derecho: Número grande + Label */}
+                <Box sx={{ textAlign: "right", minWidth: 60 }}>
                   <Typography
                     variant="h5"
-                    fontWeight={800}
-                    color="text.primary"
-                    lineHeight={1}>
+                    sx={{
+                      fontWeight: 800, // Extra bold para el número
+                      color: "text.primary",
+                      lineHeight: 1,
+                      mb: 0.5
+                    }}
+                  >
                     {pact.seats}
                   </Typography>
                   <Typography
                     variant="caption"
-                    fontWeight={700}
-                    color="text.secondary"
-                    sx={{ fontSize: "0.6rem", textTransform: "uppercase" }}>
+                    sx={{
+                      fontWeight: 700,
+                      color: "text.secondary",
+                      fontSize: "0.6rem",
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                      opacity: 0.8
+                    }}
+                  >
                     Electos
                   </Typography>
                 </Box>
