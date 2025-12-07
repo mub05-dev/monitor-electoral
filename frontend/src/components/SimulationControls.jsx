@@ -37,9 +37,7 @@ export default function SimulationControls({
         overflow: "hidden",
         mb: 3,
         bgcolor: "white",
-        position: "sticky", // Hacemos que se pegue al subir
-        top: 80, // Ajusta esto según la altura de tu Navbar principal
-        zIndex: 90,
+        position: "relative", // Hacemos que se pegue al subir
       }}>
       {/* FILA 1: CONTROL MAESTRO (Selector y Botón) */}
       <Box

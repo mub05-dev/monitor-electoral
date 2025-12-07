@@ -22,6 +22,7 @@ import DistrictView from "./DistrictView";
 import GenderView from "./GenderView";
 import ParticipationCard from "../components/ParticipationCard";
 import SimulationView from "./SimulationView";
+import PhenomenaStats from "../components/PhenomenaStats";
 
 export default function Dashboard() {
   const theme = useTheme();
@@ -95,7 +96,7 @@ export default function Dashboard() {
         {currentTab === 1 && (
           <Fade in={true} timeout={500}>
             <Box>
-              <SimulationView pactColors={pactColors}/>
+              <SimulationView pactColors={pactColors} />
             </Box>
           </Fade>
         )}
@@ -110,6 +111,7 @@ export default function Dashboard() {
           <Fade in={true} timeout={500}>
             <Box>
               <GenderView />
+              <PhenomenaStats />
             </Box>
           </Fade>
         )}

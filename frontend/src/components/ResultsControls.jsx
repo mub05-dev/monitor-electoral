@@ -18,7 +18,7 @@ export default function ResultsControls({
       elevation={0}
       sx={{
         border: "1px solid #e0e0e0", borderRadius: 3, overflow: "hidden", mb: 3,
-        bgcolor: "white", position: 'sticky', top: 80, zIndex: 90
+        bgcolor: "white", position: 'relative',
       }}
     >
       {/* SECCIÓN SUPERIOR (SIN CAMBIOS) */}

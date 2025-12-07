@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Grid, Box, CircularProgress, Alert, Typography } from "@mui/material";
 import GenderDonut from "../components/GenderDonut";
 import DistrictGenderChart from "../components/DistrictGenderChart";
+import { getNacionalStats } from "../data/api";
 
 export default function GenderView() {
   const [data, setData] = useState(null);
@@ -12,9 +13,8 @@ export default function GenderView() {
     const loadStats = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:5000/stats/genero");
-        const json = await response.json();
-        setData(json);
+        const response = await getNacionalStats();
+        setData(response.data);
       } catch (e) {
         setError("Error cargando estadísticas");
       } finally {
@@ -46,7 +46,6 @@ export default function GenderView() {
       </Typography>
 
       <Grid container spacing={3} alignItems="stretch">
-        {/* FILA 1: DONUTS (Mitad y Mitad) */}
         <Grid item xs={12} md={6} lg={3}>
           <GenderDonut
             title="Total Candidatos"
@@ -62,8 +61,6 @@ export default function GenderView() {
             women={electos.mujeres}
           />
         </Grid>
-
-        {/* FILA 2: DISTRITOS (Ancho Completo) */}
         <Grid item xs={12} md={12} lg={6}>
           <DistrictGenderChart distritos={data.distritos} />
         </Grid>

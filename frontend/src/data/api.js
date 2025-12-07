@@ -34,6 +34,17 @@ const getNacionalStats = async () => {
   return response;
 };
 
+const getPhenomenaStats = async (tipo = "real", escenario = "", limit = 10) => {
+  const params = {
+    tipo,
+    limit,
+  };
+  if (escenario) params.escenario = escenario;
+
+  const response = await axios.get("stats/fenomenos", { params });
+  return response;
+};
+
 const login = async (username, password) => {
   const response = await axios.post("login", { username, password });
   return response;
@@ -44,5 +55,6 @@ export {
   getDhondtResults,
   getNacionalResults,
   getNacionalStats,
+  getPhenomenaStats,
   login,
 };
