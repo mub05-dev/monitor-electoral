@@ -39,11 +39,22 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await authentication(username, password);
-    if (success) {
-      navigate("/");
-    } else {
-      setError(true);
+
+    if (!username.trim() || !password.trim()) {
+      setError("Por favor ingrese usuario y contraseña");
+      return;
+    }
+
+    try {
+      const success = await authentication(username, password);
+      if (success) {
+        setError("");
+        navigate("/");
+      } else {
+        setError("Credenciales incorrectas. Intente nuevamente.");
+      }
+    } catch (error) {
+      setError("Ocurrió un error de conexión.");
     }
   };
 
