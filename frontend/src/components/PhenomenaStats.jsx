@@ -173,7 +173,7 @@ export default function PhenomenaStats() {
             </Stack>
             <Typography variant="body2" color="text.secondary" paragraph>
               Candidatos electos con <b>baja votación</b> gracias al "arrastre"
-              de compañeros fuertes.
+              de compañeros.
             </Typography>
             <Divider sx={{ mb: 2 }} />
 

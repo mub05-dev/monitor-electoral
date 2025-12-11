@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Box, CircularProgress, Alert } from "@mui/material";
 
-// Servicios
 import { getAllCandidates, getDhondtResults } from "../data/api";
 
-// Componentes Hijos
 // import MethodologyCard from "../components/kpi/MethodologyCard";
 // import SimulationControls from "../components/simulation/SimulationControls";
 // import DistrictTable from "../components/simulation/DistrictTable";
-import NationalView from "./NationalView"; // Reutilizamos la vista nacional
+import NationalView from "./NationalView";
 import SimulationControls from "../components/SimulationControls";
 import DistrictTable from "../components/DistrictTable";
 
 export default function SimulationView({ pactColors }) {
-  // ESTADOS
-  const [district, setDistrict] = useState("10"); // Distrito seleccionado
-  const [currentTab, setCurrentTab] = useState(0); // 0: Nacional, 1: Detalle
+  const [district, setDistrict] = useState("10");
+  const [currentTab, setCurrentTab] = useState(0);
 
-  // DATA
   const [candidates, setCandidates] = useState([]);
   const [pactNames, setPactNames] = useState({});
   const [loading, setLoading] = useState(false);
@@ -27,7 +23,6 @@ export default function SimulationView({ pactColors }) {
   const totalCandidates = candidates.length;
   const totalElected = candidates.filter((c) => c.isElected).length;
 
-  // 1. CARGA INICIAL (Solo candidatos al cambiar distrito)
   useEffect(() => {
     loadDistrictData();
   }, [district]);
@@ -35,10 +30,10 @@ export default function SimulationView({ pactColors }) {
   const loadDistrictData = async () => {
     setLoading(true);
     setError(null);
-    setCurrentTab(1); // Al cambiar distrito, volvemos a la lista completa
+    setCurrentTab(1);
     try {
       const res = await getAllCandidates(district, "simulacion");
-      // Limpiamos banderas de electos anteriores
+
       const rawCandidates = (res.data.candidates || []).map((c) => ({
         ...c,
         isElected: false,
@@ -46,8 +41,8 @@ export default function SimulationView({ pactColors }) {
       setCandidates(rawCandidates);
       const pactsObj = {};
       if (res.data.pacts) {
-        res.data.pacts.forEach(p => {
-            pactsObj[p._id] = p.name;
+        res.data.pacts.forEach((p) => {
+          pactsObj[p._id] = p.name;
         });
       }
       setPactNames(pactsObj);
@@ -58,11 +53,9 @@ export default function SimulationView({ pactColors }) {
     }
   };
 
-  // 2. ACCIÓN: SIMULAR D'HONDT
   const handleCalculate = async () => {
     setCalculating(true);
     try {
-      // Obtenemos los ganadores del backend
       const res = await getDhondtResults(district, "simulacion");
       console.log("res", res);
       const electedList = res.data.elected || [];
@@ -72,7 +65,6 @@ export default function SimulationView({ pactColors }) {
         isElected: electedNames.has(c.name),
       }));
 
-      // Ordenamos: Electos primero, luego por votos
       updatedCandidates.sort((a, b) => {
         if (a.isElected === b.isElected) return b.votes - a.votes;
         return a.isElected ? -1 : 1;
@@ -80,7 +72,6 @@ export default function SimulationView({ pactColors }) {
 
       setCandidates(updatedCandidates);
 
-      // Opcional: Cambiar automáticamente al tab de detalle para ver el resultado
       setCurrentTab(1);
     } catch (e) {
       setError("Error en el cálculo D'Hondt");
@@ -94,7 +85,6 @@ export default function SimulationView({ pactColors }) {
 
   return (
     <Box>
-      {/* <MethodologyCard /> */}
       <SimulationControls
         district={district}
         setDistrict={setDistrict}
@@ -105,7 +95,6 @@ export default function SimulationView({ pactColors }) {
         stats={{ total: totalCandidates, electos: totalElected }}
       />
 
-      {/* 3. CONTENIDO SEGÚN PESTAÑA */}
       <Box sx={{ minHeight: 400 }}>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -119,7 +108,6 @@ export default function SimulationView({ pactColors }) {
           </Box>
         ) : (
           <>
-            {/* TAB 0: IMPACTO NACIONAL (Hemiciclo) */}
             {currentTab === 0 && (
               <Box>
                 <NationalView dataType="simulacion" pactColors={pactColors} />
@@ -130,7 +118,9 @@ export default function SimulationView({ pactColors }) {
               <DistrictTable
                 candidates={displayedCandidates}
                 title={
-                  currentTab === 2 ? "Resultados por Pacto" : "Nómina Candidatos"
+                  currentTab === 2
+                    ? "Resultados por Pacto"
+                    : "Nómina Candidatos"
                 }
                 isElectedMode={currentTab === 2}
                 pactColors={pactColors}

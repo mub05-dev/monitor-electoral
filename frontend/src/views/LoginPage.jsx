@@ -16,7 +16,6 @@ import {
 import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// Iconos
 import HowToVoteIcon from "@mui/icons-material/HowToVote";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -56,11 +55,10 @@ export default function LoginPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // Fondo sobrio y elegante
+
         background:
           "radial-gradient(circle at 50% 10%, #f0f4f8 0%, #d9e2ec 100%)",
       }}>
-      {/* Fuentes formales */}
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Lato:wght@300;400;700&display=swap');
@@ -79,7 +77,6 @@ export default function LoginPage() {
             bgcolor: "#ffffff",
             borderTop: `6px solid #102a43`,
           }}>
-          {/* FILA 1: ÍCONO */}
           <Box display="flex" justifyContent="center" mb={3}>
             <Box
               p={1.5}
@@ -91,7 +88,6 @@ export default function LoginPage() {
             </Box>
           </Box>
 
-          {/* FILA 2: TÍTULO PRINCIPAL */}
           <Typography
             variant="h5"
             sx={{
@@ -104,7 +100,6 @@ export default function LoginPage() {
             Bienvenido a Monitor Electoral
           </Typography>
 
-          {/* FILA 3: DESCRIPCIÓN */}
           <Typography
             variant="body1"
             sx={{

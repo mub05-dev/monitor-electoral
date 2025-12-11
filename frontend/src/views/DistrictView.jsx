@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Box, CircularProgress, Alert, Typography } from "@mui/material";
 
-// Imports de API
 import {
   getAllCandidates,
   getDhondtResults,
   getNacionalResults,
 } from "../data/api";
 
-// Imports de Componentes
 import ResultsControls from "../components/ResultsControls";
 import RealDistrictTable from "../components/RealDistrictTable";
 import AllianceSelector from "../components/AllianceSelector";
@@ -18,24 +16,20 @@ import NationalSummary from "../components/layout/NationalSummary";
 const INCENTIVE_PER_WOMAN = 500;
 
 export default function DistrictView({ dataType = "real", pactColors }) {
-  // --- ESTADOS ---
   const [district, setDistrict] = useState("10");
   const [currentTab, setCurrentTab] = useState(0);
 
-  // Datos Distritales
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [pacts, setPacts] = useState([]);
   const [electedCandidates, setElectedCandidates] = useState([]);
 
-  // Datos Nacionales (Simulación)
   const [scenario, setScenario] = useState("");
   const [nationalElected, setNationalElected] = useState([]);
-  // 1. NUEVO ESTADO: Para guardar el resumen que ya viene listo del backend
+
   const [nationalSummaryResults, setNationalSummaryResults] = useState([]);
   const [loadingSim, setLoadingSim] = useState(false);
 
-  // Estados de carga generales
   const [loading, setLoading] = useState(false);
   const [loadingResults, setLoadingResults] = useState(false);
   const [hasResults, setHasResults] = useState(false);
@@ -46,17 +40,15 @@ export default function DistrictView({ dataType = "real", pactColors }) {
     ? candidates.filter((c) => c.isElected).length
     : 0;
 
-  // Extender colores para simulación
   const extendedColors = useMemo(
     () => ({
       ...pactColors,
-      SC_DER: pactColors["K"] || "#000080", // Mapeamos ID Backend -> Color
+      SC_DER: pactColors["K"] || "#000080",
       SC_IZQ: pactColors["C"] || "#FF0000",
     }),
     [pactColors]
   );
 
-  // Carga Base
   useEffect(() => {
     loadDistrictBase();
   }, [district, dataType]);
@@ -69,7 +61,7 @@ export default function DistrictView({ dataType = "real", pactColors }) {
     setCurrentTab(0);
     setScenario("");
     setNationalElected([]);
-    setNationalSummaryResults([]); // Limpiamos resumen anterior
+    setNationalSummaryResults([]);
     try {
       const resCands = await getAllCandidates(district, dataType);
       const rawCandidates = resCands.data.candidates || [];
@@ -84,7 +76,6 @@ export default function DistrictView({ dataType = "real", pactColors }) {
     }
   };
 
-  // Carga Resultados Locales
   const handleLoadLocalResults = async () => {
     setLoadingResults(true);
     try {
@@ -112,19 +103,15 @@ export default function DistrictView({ dataType = "real", pactColors }) {
     }
   };
 
-  // 2. MODIFICACIÓN AQUÍ: Guardar el resumen del backend
   const handleSimulateNational = async (selectedScenario) => {
-    // Permitimos llamar incluso si selectedScenario es vacío (para cargar default)
     setLoadingSim(true);
     try {
       const res = await getNacionalResults(dataType, selectedScenario);
 
-      // Guardamos Diputados (para el Hemiciclo)
       if (res.data && res.data.diputados) {
         setNationalElected(res.data.diputados);
       }
 
-      // Guardamos Resumen (para la lista lateral) - ¡ESTO ES LO NUEVO!
       if (res.data && res.data.resumen) {
         setNationalSummaryResults(res.data.resumen);
       }
@@ -136,7 +123,6 @@ export default function DistrictView({ dataType = "real", pactColors }) {
     }
   };
 
-  // Memos Tabla Local (Sin cambios)
   const { partyMap, pactNamesMap } = useMemo(() => {
     const pMap = new Map(pacts.map((p) => [p._id, p]));
     const paMap = new Map(
@@ -151,9 +137,8 @@ export default function DistrictView({ dataType = "real", pactColors }) {
   }, [parties, pacts]);
 
   const pactResults = useMemo(() => {
-    // 1. Agrupar electos por pacto
     const electMap = new Map();
-    // 2. Calcular incentivos por género
+
     const iPacts = new Map();
     const iParties = new Map();
 
@@ -173,18 +158,15 @@ export default function DistrictView({ dataType = "real", pactColors }) {
       }
     });
 
-    // 3. Mapear resultados finales
     return pacts
       .map((p) => {
-        // --- LÓGICA RECUPERADA: Filtrar partidos de este pacto ---
         const pactParties = parties
-          .filter((py) => py.list_id === p._id) // Filtramos por ID de lista
+          .filter((py) => py.list_id === p._id)
           .map((py) => ({
             ...py,
             incentive: iParties.get(py._id) || 0,
           }))
-          .sort((a, b) => b.votes - a.votes); // Ordenamos por votos
-        // ---------------------------------------------------------
+          .sort((a, b) => b.votes - a.votes);
 
         return {
           pactId: p._id,
@@ -195,14 +177,11 @@ export default function DistrictView({ dataType = "real", pactColors }) {
           ),
           seats: (electMap.get(p._id) || []).length,
           incentive: iPacts.get(p._id) || 0,
-          parties: pactParties, // <--- AQUÍ PASAMOS LA DATA AL COMPONENTE
+          parties: pactParties,
         };
       })
       .sort((a, b) => b.pactVotes - a.pactVotes);
   }, [pacts, electedCandidates, parties, partyMap]);
-
-  // 3. BORRADO: Eliminamos el useMemo 'nationalSummaryData' antiguo.
-  // Ya no necesitamos calcularlo a mano porque 'nationalSummaryResults' lo trae listo.
 
   return (
     <Box>
@@ -231,7 +210,6 @@ export default function DistrictView({ dataType = "real", pactColors }) {
           </Box>
         ) : (
           <>
-            {/* ---------------- TAB 2: SIMULACIÓN NACIONAL ---------------- */}
             {currentTab === 2 && (
               <Box>
                 <AllianceSelector
@@ -256,7 +234,6 @@ export default function DistrictView({ dataType = "real", pactColors }) {
                 ) : nationalElected.length > 0 ? (
                   <Box sx={{ mt: 2 }}>
                     <NationalSummary
-                      // 4. USAMOS EL DATO DEL BACKEND DIRECTAMENTE
                       summaryData={nationalSummaryResults}
                       pactColors={extendedColors}
                       totalDiputados={155}>
@@ -267,7 +244,6 @@ export default function DistrictView({ dataType = "real", pactColors }) {
                     </NationalSummary>
                   </Box>
                 ) : (
-                  // Muestra un mensaje inicial si no se ha simulado nada
                   !loadingSim && (
                     <Box textAlign="center" py={4}>
                       <Typography color="text.secondary">
@@ -280,7 +256,6 @@ export default function DistrictView({ dataType = "real", pactColors }) {
               </Box>
             )}
 
-            {/* TABS LOCALES (Sin cambios) */}
             {currentTab === 1 && (
               <RealDistrictTable
                 candidates={candidates}

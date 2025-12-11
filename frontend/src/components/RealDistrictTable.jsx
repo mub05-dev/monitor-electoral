@@ -28,7 +28,6 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 const INCENTIVE_PER_WOMAN = 500;
 const formatNumber = (num) => new Intl.NumberFormat("es-CL").format(num);
 
-// --- TABLA PLANA ---
 const CandidatesListTable = ({ candidates, pactNames, pactColors }) => (
   <TableContainer>
     <Table sx={{ width: "100%", tableLayout: "fixed" }}>
@@ -125,7 +124,6 @@ const CandidatesListTable = ({ candidates, pactNames, pactColors }) => (
   </TableContainer>
 );
 
-// --- ACORDEÓN COMPLEJO (Con Data Procesada) ---
 const ResultsAccordion = ({ pactResults, pactColors }) => {
   const [openPacts, setOpenPacts] = useState({});
 
@@ -386,7 +384,7 @@ export default function RealDistrictTable({
   pactColors = {},
   pactNames = {},
 }) {
-  if (isLoading) return null; // El loading se maneja arriba
+  if (isLoading) return null;
   if (!candidates || candidates.length === 0) {
     return (
       <Alert severity="info" sx={{ mt: 2 }}>
@@ -397,7 +395,7 @@ export default function RealDistrictTable({
 
   return (
     <Paper sx={{ overflow: "hidden", mt: 0 }}>
-      {/* HEADER */}
+      
       <Box
         sx={{
           px: 3,

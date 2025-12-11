@@ -3,20 +3,17 @@ import { Box, Paper, Typography, Stack } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
 
 const GenderDonut = ({ title, men, women }) => {
-  // Validación de seguridad
   const safeMen = men || 0;
   const safeWomen = women || 0;
   const total = safeMen + safeWomen;
 
   if (total === 0) return null;
 
-  // Cálculos para CSS
   const pctMen = (safeMen / total) * 100;
   const pctWomenDisplay = ((safeWomen / total) * 100).toFixed(1);
 
-  // Colores Configurable
-  const COLOR_H = "#42a5f5"; // Azul
-  const COLOR_M = "#ec407a"; // Rosa
+  const COLOR_H = "#42a5f5";
+  const COLOR_M = "#ec407a";
 
   return (
     <Paper
@@ -39,8 +36,6 @@ const GenderDonut = ({ title, men, women }) => {
           {total.toLocaleString("es-CL")}
         </Typography>
       </Box>
-
-      {/* DONA CSS */}
       <Box
         sx={{
           position: "relative",
@@ -53,7 +48,6 @@ const GenderDonut = ({ title, men, women }) => {
           justifyContent: "center",
           my: 2,
         }}>
-        {/* Centro Blanco */}
         <Box
           sx={{
             width: 150,
@@ -81,7 +75,6 @@ const GenderDonut = ({ title, men, women }) => {
         </Box>
       </Box>
 
-      {/* LEYENDA */}
       <Stack
         direction="row"
         spacing={4}

@@ -19,7 +19,6 @@ export default function AllianceSelector({
   const handleChange = (event) => {
     const val = event.target.value;
     setScenario(val);
-    // Dispara la carga nacional inmediatamente al seleccionar
     if (val) {
       onSimulate(val);
     }

@@ -20,14 +20,13 @@ const PactCards = ({ summaryData, pactColors }) => {
             <Divider
               sx={{
                 borderStyle: "dashed",
-                borderColor: "rgba(0, 0, 0, 0.1)", // Gris muy suave
+                borderColor: "rgba(0, 0, 0, 0.1)",
                 my: 1,
               }}
             />
           }
         >
           {summaryData.map((pact) => {
-            // Lógica para determinar el color
             const colorKey =
               pact.id === "others" || pact.id === "indep"
                 ? pact.color_key || "default"
@@ -41,12 +40,10 @@ const PactCards = ({ summaryData, pactColors }) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  py: 0.5, // Reducimos padding para que se vea compacto
+                  py: 0.5,
                 }}
               >
-                {/* Lado Izquierdo: Barra de color + Texto */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  {/* Barra vertical de color */}
                   <Box
                     sx={{
                       width: 4,
@@ -67,22 +64,20 @@ const PactCards = ({ summaryData, pactColors }) => {
                     >
                       {pact.name}
                     </Typography>
-                    <Typography
+                    {/* <Typography
                       variant="caption"
                       color="text.secondary"
                       sx={{ fontSize: "0.75rem" }}
                     >
                       {formatCompact(pact.votes)} votos
-                    </Typography>
+                    </Typography> */}
                   </Box>
                 </Box>
-
-                {/* Lado Derecho: Número grande + Label */}
                 <Box sx={{ textAlign: "right", minWidth: 60 }}>
                   <Typography
                     variant="h5"
                     sx={{
-                      fontWeight: 800, // Extra bold para el número
+                      fontWeight: 800,
                       color: "text.primary",
                       lineHeight: 1,
                       mb: 0.5

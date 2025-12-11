@@ -55,9 +55,7 @@ const Hemicycle = ({ diputados, pactColors }) => {
           maxWidth: width,
           margin: "0 auto",
         }}
-      >
-        {/* --- SECCIÓN BORRADA: EL TÍTULO YA NO VA AQUÍ --- */}
-        
+      > 
         <svg
           viewBox={`0 0 ${width} ${height}`}
           width={width}

@@ -4,10 +4,9 @@ import { Paper, Typography, Box, Tooltip, Stack } from "@mui/material";
 const DistrictGenderChart = ({ distritos }) => {
   if (!distritos || distritos.length === 0) return null;
 
-  const COLOR_H = "#42a5f5"; // Azul
-  const COLOR_M = "#ec407a"; // Rosa
+  const COLOR_H = "#42a5f5";
+  const COLOR_M = "#ec407a";
 
-  // Calcular máximo para escala vertical
   const maxSeats = Math.max(...distritos.map((d) => d.electos.total));
 
   return (
@@ -22,7 +21,6 @@ const DistrictGenderChart = ({ distritos }) => {
         display: "flex",
         flexDirection: "column",
       }}>
-      {/* HEADER */}
       <Box
         mb={2}
         display="flex"
@@ -63,7 +61,7 @@ const DistrictGenderChart = ({ distritos }) => {
           flexGrow: 1,
           display: "flex",
           alignItems: "flex-end",
-          justifyContent: "space-between", // Distribuye uniformemente
+          justifyContent: "space-between", 
           height: 280,
           pt: 2,
           overflowX: "auto",

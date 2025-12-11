@@ -5,7 +5,7 @@ import PactCards from "../../components/kpi/PactCards";
 const NationalSummary = ({ 
   summaryData, 
   pactColors, 
-  children // Aquí viene tu componente <Hemicycle>
+  children 
 }) => {
   return (
     <Paper
@@ -17,10 +17,10 @@ const NationalSummary = ({
         borderColor: "divider",
         bgcolor: "background.paper",
         boxShadow: "0px 4px 24px rgba(0,0,0,0.05)",
-        overflow: "hidden" // Evita desbordes extraños
+        overflow: "hidden"
       }}
     >
-      {/* 1. TÍTULO: Full Width (Fuera de la Grid) */}
+      
       <Box sx={{ mb: 4, borderBottom: '1px solid #eee', pb: 2 }}>
         <Typography
           variant="h5"
@@ -37,7 +37,7 @@ const NationalSummary = ({
 
       <Grid container spacing={4} alignItems="center">
         
-        {/* COLUMNA IZQUIERDA: Hemiciclo */}
+     
         <Grid item xs={12} md={7} lg={8}>
           <Box
             sx={{
@@ -46,21 +46,19 @@ const NationalSummary = ({
               justifyContent: "center",
               alignItems: "center",
               minHeight: 300,
-              // Ajustes para contener tu gráfico si es muy grande:
+              
               '& > div': { 
                   maxWidth: '100%',
-                  transform: 'scale(1)', // Ajusta esto si se ve gigante
+                  transform: 'scale(1)',
                   transformOrigin: 'top center'
               }
             }}
           >
-            {/* Renderizamos directamente el hijo (Tu Hemicycle) */}
-            {/* Eliminé el texto manual de "155 Diputados" para que no se duplique con el tuyo */}
             {children} 
           </Box>
         </Grid>
 
-        {/* COLUMNA DERECHA: Lista de Pactos */}
+        
         <Grid item xs={12} md={5} lg={4}>
           <PactCards summaryData={summaryData} pactColors={pactColors} />
         </Grid>

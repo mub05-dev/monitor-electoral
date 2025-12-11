@@ -21,7 +21,7 @@ export default function ResultsControls({
         bgcolor: "white", position: 'relative',
       }}
     >
-      {/* SECCIÓN SUPERIOR (SIN CAMBIOS) */}
+      
       <Box sx={{ p: 2, display: "flex", gap: 2, alignItems: "center", flexWrap: 'wrap', bgcolor: '#f0fdf4', borderBottom: '1px solid #e0e0e0' }}>
         <FormControl size="small" sx={{ minWidth: 300, bgcolor: 'white' }}>
           <InputLabel>Seleccionar Distrito</InputLabel>
@@ -62,7 +62,7 @@ export default function ResultsControls({
         </Box>
       </Box>
 
-      {/* SECCIÓN TABS - AGREGAMOS LA TERCERA OPCIÓN */}
+      
       <Box sx={{ px: 2 }}>
         <Tabs 
             value={currentTab} onChange={onTabChange}
@@ -71,7 +71,7 @@ export default function ResultsControls({
             <Tab icon={<FormatListBulletedIcon fontSize="small"/>} iconPosition="start" label="Nómina Local" sx={{ textTransform: 'none', fontWeight: 600 }} />
             <Tab icon={<EmojiEventsIcon fontSize="small"/>} iconPosition="start" label="Resultados Local" disabled={!hasResults} sx={{ textTransform: 'none', fontWeight: 600 }} />
             
-            {/* NUEVA PESTAÑA */}
+            
             <Tab 
                 icon={<HandshakeIcon fontSize="small"/>} 
                 iconPosition="start" 

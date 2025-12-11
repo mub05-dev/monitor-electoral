@@ -37,9 +37,9 @@ export default function SimulationControls({
         overflow: "hidden",
         mb: 3,
         bgcolor: "white",
-        position: "relative", // Hacemos que se pegue al subir
+        position: "relative", 
       }}>
-      {/* FILA 1: CONTROL MAESTRO (Selector y Botón) */}
+      
       <Box
         sx={{
           p: 2,
@@ -103,7 +103,7 @@ export default function SimulationControls({
             icon={<EmojiEventsIcon fontSize="small" />}
             iconPosition="start"
             label="Electos (Resultados)"
-            disabled={!stats || stats.electos === 0} // Se habilita solo al calcular
+            disabled={!stats || stats.electos === 0}
             sx={{ textTransform: "none", fontWeight: 600, minHeight: 48 }}
           />
         </Tabs>
